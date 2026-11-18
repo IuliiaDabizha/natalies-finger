@@ -1,0 +1,529 @@
+@import url('https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap');
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  image-rendering: pixelated;
+  image-rendering: crisp-edges;
+  user-select: none;
+}
+
+body {
+  background: #11081f;
+  overflow: hidden;
+  width: 100vw;
+  height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: 'Press Start 2P', monospace;
+  color: #fff;
+}
+
+#game-screen {
+  position: relative;
+  width: 720px;
+  height: 540px;
+  background: #000;
+  border: 6px solid #4a2d82;
+  box-shadow: 0 0 35px rgba(142, 68, 173, 0.6), 0 0 70px rgba(241, 196, 15, 0.3);
+  border-radius: 10px;
+  overflow: hidden;
+}
+
+canvas#mainCanvas {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+/* TOP POKEMON HUD */
+#top-hud {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 42px;
+  background: rgba(10, 5, 20, 0.95);
+  border-bottom: 3px solid #f1c40f;
+  display: none; /* Shown dynamically when game starts */
+  justify-content: space-between;
+  align-items: center;
+  padding: 0 10px;
+  z-index: 25;
+  box-sizing: border-box;
+}
+
+.hud-left {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  max-width: 320px;
+  overflow: hidden;
+}
+
+.hud-title {
+  color: #f1c40f;
+  text-shadow: 1px 1px 0 #c0392b;
+  font-size: 7.5px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 290px;
+  line-height: 1.4;
+}
+
+.hud-compass {
+  color: #ffd700;
+  font-size: 6.8px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 290px;
+  line-height: 1.4;
+}
+
+.hud-buttons {
+  display: flex;
+  gap: 5px;
+  flex-shrink: 0;
+}
+
+.pixel-btn {
+  background: #2c1a4d;
+  color: #ffd700;
+  border: 2px solid #ffd700;
+  font-family: 'Press Start 2P', monospace;
+  font-size: 7.5px;
+  padding: 4px 6px;
+  cursor: pointer;
+  box-shadow: 2px 2px 0 #000;
+  transition: transform 0.1s;
+  white-space: nowrap;
+}
+
+.pixel-btn:hover {
+  background: #e74c3c;
+  color: #fff;
+  transform: translate(-1px, -1px);
+}
+
+.pixel-btn:active {
+  transform: translate(1px, 1px);
+}
+
+/* POKEMON DIALOGUE BOX */
+#dialogue-box {
+  position: absolute;
+  bottom: 8px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 704px;
+  min-height: 135px;
+  max-height: 190px;
+  background: #fbfbfb;
+  border: 5px solid #282828;
+  border-radius: 6px;
+  box-shadow: inset 0 0 0 4px #c8c8c8, 0 4px 15px rgba(0,0,0,0.8);
+  padding: 10px 14px;
+  color: #222;
+  font-size: 10px;
+  line-height: 1.5;
+  display: none;
+  z-index: 30;
+  cursor: pointer;
+  transition: width 0.15s ease-out;
+}
+
+#dialogue-box.battle-mode-split {
+  left: 8px;
+  transform: none;
+  width: 380px;
+}
+
+.dlg-speaker {
+  color: #c0392b;
+  font-weight: bold;
+  font-size: 10.5px;
+  margin-bottom: 4px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.dlg-text {
+  font-size: 9.5px;
+  min-height: 36px;
+  color: #111;
+  word-break: break-word;
+}
+
+.dlg-choices-container {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  margin-top: 6px;
+}
+
+.dlg-choice-btn {
+  background: #2c1a4d;
+  color: #ffd700;
+  border: 2px solid #f1c40f;
+  padding: 6px 8px;
+  font-family: 'Press Start 2P', monospace;
+  font-size: 7.5px;
+  line-height: 1.4;
+  text-align: left;
+  cursor: pointer;
+  box-shadow: 2px 2px 0 #000;
+  transition: all 0.1s;
+}
+
+.dlg-choice-btn:hover {
+  background: #c0392b;
+  color: #fff;
+  border-color: #ffd700;
+  transform: translate(-1px, -1px);
+}
+
+.dlg-arrow {
+  position: absolute;
+  bottom: 6px;
+  right: 12px;
+  color: #c0392b;
+  font-size: 11px;
+  animation: bounceArrow 0.6s infinite alternate;
+}
+
+@keyframes bounceArrow {
+  from { transform: translateY(0); }
+  to { transform: translateY(4px); }
+}
+
+/* INTERACT PROMPT */
+#interact-prompt {
+  position: absolute;
+  top: 55%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  background: #2c1a4d;
+  color: #f1c40f;
+  border: 3px solid #f1c40f;
+  padding: 8px 16px;
+  font-size: 9px;
+  box-shadow: 3px 3px 0 #000;
+  display: none;
+  z-index: 15;
+  animation: promptPulse 0.8s infinite alternate;
+}
+
+@keyframes promptPulse {
+  from { transform: translate(-50%, -50%) scale(1); }
+  to { transform: translate(-50%, -50%) scale(1.05); }
+}
+
+/* SHAKE & FLASH EFFECTS */
+.shake-screen {
+  animation: screenQuake 0.08s infinite;
+}
+
+@keyframes screenQuake {
+  0% { transform: translate(0, 0); }
+  25% { transform: translate(-6px, 5px); }
+  50% { transform: translate(5px, -6px); }
+  75% { transform: translate(-5px, -4px); }
+  100% { transform: translate(6px, 6px); }
+}
+
+#flash-overlay {
+  position: absolute;
+  inset: 0;
+  background: #fff;
+  opacity: 0;
+  pointer-events: none;
+  z-index: 30;
+  transition: opacity 0.05s ease-out;
+}
+
+/* COMIC / RETRO EXPLOSION BANNER */
+#explosion-banner {
+  position: absolute;
+  top: 45%;
+  left: 50%;
+  transform: translate(-50%, -50%) scale(0);
+  font-size: 26px;
+  color: #e74c3c;
+  text-shadow: 3px 3px 0 #ffd700, 5px 5px 0 #000;
+  z-index: 40;
+  pointer-events: none;
+  white-space: nowrap;
+  transition: transform 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+/* TITLE SCREEN OVERLAY */
+#title-screen {
+  position: absolute;
+  inset: 0;
+  background: #0d0614;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  z-index: 50;
+  text-align: center;
+  padding: 20px;
+}
+
+.title-logo-pixel {
+  color: #f1c40f;
+  font-size: 16px;
+  text-shadow: 3px 3px 0 #c0392b, 4px 4px 0 #000;
+  line-height: 1.4;
+  margin-bottom: 6px;
+}
+
+.title-sub-pixel {
+  color: #e74c3c;
+  font-size: 8px;
+  margin-bottom: 10px;
+  line-height: 1.5;
+}
+
+/* TITLE VIDEO TRAILER CONTAINER */
+#title-video-container {
+  width: 540px;
+  height: 290px;
+  border: 4px solid #f1c40f;
+  box-shadow: 0 0 25px rgba(241, 196, 15, 0.4), 4px 4px 0 #000;
+  position: relative;
+  background: #000;
+  overflow: hidden;
+  margin-bottom: 12px;
+  border-radius: 4px;
+}
+
+#intro-video {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+/* GAME OVER / KICKED OUT SCREEN */
+#gameover-screen {
+  position: absolute;
+  inset: 0;
+  background: rgba(13, 6, 20, 0.96);
+  border: 6px solid #e74c3c;
+  display: none;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  z-index: 60;
+  text-align: center;
+  padding: 24px;
+  animation: alertBorder 0.8s infinite alternate;
+}
+
+@keyframes alertBorder {
+  from { border-color: #c0392b; box-shadow: inset 0 0 25px rgba(192, 57, 43, 0.5); }
+  to { border-color: #f1c40f; box-shadow: inset 0 0 45px rgba(241, 196, 15, 0.8); }
+}
+
+.gameover-title {
+  color: #e74c3c;
+  font-size: 14px;
+  margin-bottom: 14px;
+  text-shadow: 2px 2px 0 #000, 0 0 10px #c0392b;
+  line-height: 1.5;
+}
+
+.gameover-box {
+  background: #1a0f2b;
+  border: 3px solid #e74c3c;
+  padding: 14px 18px;
+  max-width: 580px;
+  font-size: 8.5px;
+  line-height: 1.7;
+  color: #ffcccc;
+  margin-bottom: 18px;
+  box-shadow: 4px 4px 0 #000;
+}
+
+.start-btn-pixel {
+  background: #e74c3c;
+  color: #ffd700;
+  border: 4px solid #ffd700;
+  font-family: 'Press Start 2P', monospace;
+  font-size: 11px;
+  padding: 12px 24px;
+  cursor: pointer;
+  box-shadow: 4px 4px 0 #000;
+  transition: transform 0.1s;
+}
+
+.start-btn-pixel:hover {
+  background: #f1c40f;
+  color: #111;
+  border-color: #fff;
+  transform: scale(1.05);
+}
+
+.controls-hint-pixel {
+  margin-top: 18px;
+  font-size: 7px;
+  color: #888;
+  line-height: 1.8;
+}
+
+/* VICTORY OVERLAY */
+#victory-screen {
+  position: absolute;
+  inset: 0;
+  background: rgba(13, 6, 20, 0.95);
+  display: none;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  z-index: 60;
+  text-align: center;
+  padding: 20px;
+}
+
+.victory-title-pixel {
+  color: #f1c40f;
+  font-size: 16px;
+  text-shadow: 2px 2px 0 #c0392b, 4px 4px 0 #000;
+  line-height: 1.5;
+  margin-bottom: 20px;
+}
+
+.victory-box-pixel {
+  background: #1a0f2b;
+  border: 3px solid #f1c40f;
+  box-shadow: 4px 4px 0 #000;
+  padding: 16px;
+  max-width: 580px;
+  font-size: 8.5px;
+  line-height: 1.8;
+  color: #fff;
+  margin-bottom: 25px;
+}
+
+/* BATTLE MENU OVERLAY */
+#battle-menu-container {
+  position: absolute;
+  bottom: 8px;
+  right: 8px;
+  width: 320px;
+  height: 130px;
+  background: #fdfdfd;
+  border: 5px solid #222;
+  border-radius: 6px;
+  box-shadow: inset 0 0 0 3px #ccc, 0 4px 15px rgba(0,0,0,0.8);
+  padding: 8px;
+  display: none;
+  grid-template-columns: 1fr 1fr;
+  grid-gap: 8px;
+  z-index: 25;
+}
+
+.battle-action-btn {
+  background: #f8f9fa;
+  border: 3px solid #2d3436;
+  font-family: 'Press Start 2P', monospace;
+  font-size: 8px;
+  color: #2d3436;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  padding: 4px;
+  transition: all 0.1s;
+}
+
+.battle-action-btn:hover {
+  background: #e74c3c;
+  color: #fff;
+  border-color: #c0392b;
+  transform: scale(1.02);
+}
+
+.battle-action-btn:active {
+  transform: scale(0.98);
+}
+
+/* ITEM POPUP MODAL */
+#item-popup {
+  position: absolute;
+  top: 40%;
+  left: 50%;
+  transform: translate(-50%, -50%) scale(0.8);
+  background: #fcfcfc;
+  border: 5px solid #222;
+  border-radius: 6px;
+  box-shadow: inset 0 0 0 4px #e0e0e0, 0 8px 30px rgba(0,0,0,0.8);
+  padding: 16px 20px;
+  text-align: center;
+  display: none;
+  z-index: 45;
+  color: #111;
+  max-width: 460px;
+  opacity: 0;
+  transition: all 0.25s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+#item-popup.show {
+  display: block;
+  opacity: 1;
+  transform: translate(-50%, -50%) scale(1);
+}
+
+.item-popup-icon {
+  width: 48px;
+  height: 48px;
+  margin: 0 auto 10px auto;
+  image-rendering: pixelated;
+}
+
+.item-popup-title {
+  color: #c0392b;
+  font-size: 11px;
+  margin-bottom: 8px;
+}
+
+.item-popup-desc {
+  font-size: 8.5px;
+  line-height: 1.6;
+  color: #333;
+  margin-bottom: 12px;
+}
+
+/* INVENTORY BAR IN HUD */
+#hud-inventory {
+  display: flex;
+  gap: 4px;
+  align-items: center;
+}
+
+.hud-inv-slot {
+  width: 20px;
+  height: 20px;
+  background: #1e1233;
+  border: 1.5px solid #5a3d8a;
+  border-radius: 3px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 10px;
+  color: #666;
+}
+
+.hud-inv-slot.active {
+  border-color: #ffd700;
+  background: #391e63;
+  box-shadow: 0 0 5px #ffd700;
+  color: #fff;
+}

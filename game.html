@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>🍟 Natalie's Annulaire — Mc'Do Tassin Heist 🍟</title>
+<link rel="stylesheet" href="css/pokemon.css">
+</head>
+<body>
+
+<div id="game-screen">
+  <canvas id="mainCanvas"></canvas>
+
+  <!-- TOP HUD -->
+  <div id="top-hud">
+    <div class="hud-left">
+      <span style="font-size: 14px; flex-shrink: 0;">🍟</span>
+      <div style="overflow: hidden;">
+        <div class="hud-title" id="hud-mission">MISSION: INFILTRATE MC'DO & TROLL NATALIE</div>
+        <div class="hud-compass" id="compass">📍 Mc'Do Tassin la Demi-Lune (Lyon)</div>
+      </div>
+    </div>
+
+    <!-- INVENTORY SLOTS -->
+    <div id="hud-inventory">
+      <!-- Generated dynamically by JS -->
+    </div>
+
+    <!-- BUTTONS -->
+    <div class="hud-buttons">
+      <button class="pixel-btn" id="lang-btn" onclick="toggleLanguage()">🇫🇷 FR</button>
+      <button class="pixel-btn" id="sound-btn" onclick="toggleSound()">🔊 SOUND</button>
+    </div>
+  </div>
+
+  <!-- INTERACTION PROMPT -->
+  <div id="interact-prompt">[E] TALK</div>
+
+  <!-- WHITE FLASH OVERLAY -->
+  <div id="flash-overlay"></div>
+
+  <!-- RETRO EXPLOSION BANNER -->
+  <div id="explosion-banner">💥 KABOOOOOM! NATALIE EXPLODED! 💥</div>
+
+  <!-- RETRO DIALOGUE BOX -->
+  <div id="dialogue-box">
+    <div class="dlg-speaker" id="dlg-speaker">Clement</div>
+    <div class="dlg-text" id="dlg-text">"Closing up front at comptoir..."</div>
+    <div class="dlg-choices-container" id="dlg-choices-container"></div>
+    <div class="dlg-arrow" id="dlg-arrow">▼</div>
+  </div>
+
+  <!-- BATTLE MENU CONTAINER -->
+  <div id="battle-menu-container">
+    <!-- Populated in Battle Mode -->
+  </div>
+
+  <!-- ITEM POPUP MODAL -->
+  <div id="item-popup">
+    <img id="item-popup-icon" class="item-popup-icon" alt="Item">
+    <div class="item-popup-title" id="item-popup-title">OBTAINED ITEM!</div>
+    <div class="item-popup-desc" id="item-popup-desc">You found an item.</div>
+    <div style="font-size: 7px; color: #ffd700; margin-top: 8px;">[ Click or Press E / Space to continue ]</div>
+  </div>
+
+  <!-- TITLE SCREEN -->
+  <div id="title-screen">
+    <div class="title-logo-pixel">
+      🍟 NATALIE'S ANNULAIRE 🍟
+    </div>
+    <div class="title-sub-pixel" id="title-sub">
+      Le Braquage Troll Légendaire • Mc'Do Tassin la Demi-Lune (Lyon)
+    </div>
+
+    <!-- EPIC INTRO TRAILER VIDEO -->
+    <div id="title-video-container">
+      <video id="intro-video" src="intro.mp4" autoplay loop muted playsinline controls></video>
+    </div>
+
+    <div style="display: flex; gap: 12px; align-items: center; justify-content: center; margin-bottom: 12px;">
+      <button class="start-btn-pixel" id="start-btn" onclick="startGame()">▶ START HEIST / LANCER LE BRAQUAGE</button>
+      <button class="pixel-btn" id="trailer-sound-btn" onclick="toggleTrailerSound()" style="padding: 10px 14px; font-size: 9px;">🔊 UNMUTE TRAILER</button>
+    </div>
+
+    <div class="controls-hint-pixel" id="controls-hint">
+      [WASD / ARROWS] Move &nbsp;•&nbsp; [E / SPACE] Interact &nbsp;•&nbsp; [1, 2, 3] Dialogue Choices &nbsp;•&nbsp; [L] Lang &nbsp;•&nbsp; [M] Sound
+    </div>
+  </div>
+
+  <!-- GAME OVER / KICKED OUT SCREEN -->
+  <div id="gameover-screen">
+    <div class="gameover-title">🚨 EXPULSÉ DU MC'DO ! / KICKED OUT! 🚨</div>
+    <div class="gameover-box" id="gameover-desc">
+      L'équipe de Tassin la Demi-Lune a cru que vous étiez l'espion corporatif de Natalie !
+    </div>
+    <button class="start-btn-pixel" onclick="retryAfterKickOut()">🔄 RÉESSAYER / RETRY (DON'T BE A SPY)</button>
+  </div>
+
+  <!-- VICTORY OVERLAY -->
+  <div id="victory-screen">
+    <div class="victory-title-pixel">💥 BOOOOOOOOM! NATALIE A EXPLOSÉ ! 💥</div>
+    <div class="victory-box-pixel" id="victory-desc">
+      Sa tension a dépassé les 9000 bars ! Natalie a gonflé comme un ballon paprika rouge et a détoné en un geyser de nuggets dorés, de réductions 100%, de mèches paprika et d'éclats de badge doré ! Natalie a totalement disparu de Tassin la Demi-Lune !<br><br>
+      Toute l'équipe danse en tenues mignonnes d'idols pour fêter la libération du restaurant !
+    </div>
+
+    <!-- ANIME VICTORY DANCE VIDEO -->
+    <div style="margin: 8px 0; border: 3px solid #f1c40f; box-shadow: 0 0 20px rgba(241, 196, 15, 0.6); border-radius: 6px; overflow: hidden; max-width: 460px; width: 100%; background: #000;">
+      <video id="victory-video" src="victory_dance.mp4" controls autoplay loop playsinline style="width: 100%; display: block;"></video>
+    </div>
+
+    <div style="display: flex; gap: 10px; margin-top: 6px; flex-wrap: wrap; justify-content: center;">
+      <button class="start-btn-pixel" onclick="document.getElementById('victory-video').currentTime=0; document.getElementById('victory-video').play();">▶ REPLAY DANCE VIDEO</button>
+      <button class="start-btn-pixel" onclick="location.reload()">🔄 REJOUER LE BRAQUAGE</button>
+    </div>
+  </div>
+</div>
+
+<!-- SCRIPTS -->
+<script src="js/pokemon_audio.js"></script>
+<script src="js/dialogue.js"></script>
+<script src="js/pixel_art.js"></script>
+<script src="js/pokemon_game.js"></script>
+</body>
+</html>
